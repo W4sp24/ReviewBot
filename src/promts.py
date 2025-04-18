@@ -5,3 +5,6 @@ class Promts:
         self.symbol = ""      # Initialize symbol
         self.client = None    # Initialize client
         self.model = None     # Initialize model
+
+
+    
