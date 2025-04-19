@@ -22,6 +22,9 @@ class Gemini:
     def update_symbol(self, new_symbol: str):
         self.symbol = new_symbol
 
-    def generate_response(self, prompt) -> str:  # Fix typo in parameter name
-        response = self.client.models.generate_content(model = self.model, contents=prompt)
-        return response.text
+    def generate_response(self, prompt) -> str:
+        """
+        Generate a response using the Gemini API.
+        """
+        response = self.client.models.generate_content(model=self.model, contents=prompt)
+        return response.text or ""

@@ -28,7 +28,10 @@ class TextFileHandler(FileHandler):
 
 class PDFFileHandler(FileHandler):
     def read_file(self, filepath: str) -> str:
-        from textwrap import fill  # Import for paragraph formatting
+        """
+        Read the content of a PDF file and return it as a string.
+        """
+        from textwrap import fill
         with open(filepath, 'rb') as file:
             reader = PyPDF2.PdfReader(file)
             full_text = ""
@@ -143,13 +146,12 @@ class TextFormatter:
     """
     A utility class for formatting and designing text.
     """
-
     @staticmethod
     def bulleted_format(text: str, bullet: str = "\u2022") -> list:
         """
         Convert a string into a bulleted format, separating lines by bullets.
         Returns a list of formatted lines.
         """
-        lines = text.splitlines()
+        lines = text.splitlines()  # Split the input string into lines
         return [f"{bullet} {line.strip()}" for line in lines if line.strip()]
 
