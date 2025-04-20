@@ -63,9 +63,10 @@ class PDFFileHandler(FileHandler):
 
         # Define margins and spacing
         left_margin = 50
+        right_margin = 50
         top_margin = 800
-        line_spacing = 25  # Adjust this value to change the line spacing
-        max_width = 500  # Maximum width for text wrapping
+        line_spacing = 20  # Adjusted line spacing for better readability
+        max_width = 550 - left_margin - right_margin  # Adjust max width to respect margins
 
         y_position = top_margin
 
@@ -76,21 +77,24 @@ class PDFFileHandler(FileHandler):
             else:
                 key_term, rest_of_line = line, ""
 
-            # Render the key term in bold
-            pdf.setFont("Arial-Bold", 12)
-            key_term_width = pdf.stringWidth(key_term + " ", "Arial-Bold", 12)
-            pdf.drawString(left_margin, y_position, key_term)
+            # Wrap the key term and the rest of the line separately
+            wrapped_key_term = self._wrap_text(key_term, pdf, max_width)
+            wrapped_rest_of_line = self._wrap_text(rest_of_line, pdf, max_width - pdf.stringWidth(key_term + " ", "Arial-Bold", 12))
 
-            # Render the rest of the line in regular font
-            pdf.setFont("Arial", 12)
-            pdf.drawString(left_margin + key_term_width, y_position, f"- {rest_of_line}")
+            for i, wrapped_line in enumerate(wrapped_key_term + wrapped_rest_of_line):
+                if i == 0:  # Render the first line with the key term in bold
+                    pdf.setFont("Arial-Bold", 12)
+                    pdf.drawString(left_margin, y_position, key_term)
+                    pdf.setFont("Arial", 12)
+                    pdf.drawString(left_margin + pdf.stringWidth(key_term + " ", "Arial-Bold", 12), y_position, f"- {wrapped_rest_of_line[0] if wrapped_rest_of_line else ''}")
+                else:  # Render subsequent lines in regular font
+                    pdf.drawString(left_margin, y_position, wrapped_line)
 
-            # Move to the next line
-            y_position -= line_spacing
-            if y_position < 50:  # Prevent writing outside the page
-                pdf.showPage()
-                pdf.setFont("Arial", 12)  # Reset font on new page
-                y_position = top_margin
+                y_position -= line_spacing
+                if y_position < 50:  # Prevent writing outside the page
+                    pdf.showPage()
+                    pdf.setFont("Arial", 12)  # Reset font on new page
+                    y_position = top_margin
         pdf.save()
 
     @staticmethod
@@ -105,7 +109,7 @@ class PDFFileHandler(FileHandler):
 
         for word in words:
             # Check if adding the word exceeds the max_width
-            if pdf.stringWidth(current_line + " " + word, "Helvetica", 12) > max_width:
+            if pdf.stringWidth(current_line + " " + word, "Arial", 12) > max_width:
                 wrapped_lines.append(current_line.strip())
                 current_line = word
             else:
